@@ -123,6 +123,15 @@
       .status-rejected { background: var(--danger-color); color: white; }
       .conversion-note { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px; }
       .logout-btn { background: var(--danger-color); border: none; padding: 8px 15px; border-radius: 8px; color: white; cursor: pointer; margin-top: 10px; }
+      .toggle-pass { 
+        position: absolute; 
+        right: 15px; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        cursor: pointer; 
+        color: var(--text-muted); 
+      }
+      .input-wrapper { position: relative; }
     </style>
     <script>(function(s){s.dataset.zone='11026471',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 </head>
@@ -136,6 +145,10 @@
 
             <div id="registerBox">
                 <input type="tel" id="registerPhone" class="login-input" placeholder="01XXXXXXXXX" maxlength="11">
+                <div class="input-wrapper">
+                    <input type="password" id="registerPassword" class="login-input" placeholder="পাসওয়ার্ড দিন" minlength="4">
+                    <i class="fas fa-eye toggle-pass" onclick="togglePass('registerPassword', this)"></i>
+                </div>
                 <button class="auth-btn btn-register" onclick="registerWithPhone()">
                     <i class="fas fa-user-plus"></i> Registration
                 </button>
@@ -147,6 +160,10 @@
 
             <div id="loginInputBox" style="display:none; margin-top:15px;">
                 <input type="tel" id="loginPhoneInput" class="login-input" placeholder="01XXXXXXXXX" maxlength="11">
+                <div class="input-wrapper">
+                    <input type="password" id="loginPasswordInput" class="login-input" placeholder="পাসওয়ার্ড দিন">
+                    <i class="fas fa-eye toggle-pass" onclick="togglePass('loginPasswordInput', this)"></i>
+                </div>
                 <button class="auth-btn btn-login" onclick="loginWithPhone()">Login করুন</button>
                 <button class="auth-btn btn-login" style="background:transparent; border:none; color:var(--text-muted);" onclick="hideLoginInput()">Cancel</button>
             </div>
@@ -335,6 +352,20 @@
             return /^01[3-9]\d{8}$/.test(phone);
         }
 
+        // Toggle password visibility
+        window.togglePass = function(id, icon) {
+            const input = document.getElementById(id);
+            if(input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
         // Show login input field
         window.showLoginInput = function() {
             document.getElementById('loginInputBox').style.display = 'block';
@@ -344,12 +375,18 @@
             document.getElementById('loginInputBox').style.display = 'none';
         }
 
-        // Registration with Phone Number
+        // Registration with Phone Number + Password
         window.registerWithPhone = async function() {
             const phone = document.getElementById('registerPhone').value.trim();
+            const password = document.getElementById('registerPassword').value.trim();
             
             if (!isValidPhone(phone)) {
                 showNotification('সঠিক 11 ডিজিটের নাম্বার দিন। যেমন: 01712345678', 'error');
+                return;
+            }
+
+            if(password.length < 4) {
+                showNotification('পাসওয়ার্ড কমপক্ষে 4 ডিজিট হতে হবে', 'error');
                 return;
             }
 
@@ -362,6 +399,7 @@
 
             const userData = {
                 phone: phone,
+                password: password, // সিম্পল স্টোরেজ, প্রোডাকশনে হ্যাশ করা উচিত
                 watchedAdsCount: 0,
                 earnedPoints: 0,
                 referralCount: 0,
@@ -376,18 +414,23 @@
 
             showNotification('রেজিস্ট্রেশন সফল!', 'success');
             
-            // Directly go to home page
             document.getElementById('authGate').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
             await initApp();
         }
 
-        // Login with Phone Number
+        // Login with Phone Number + Password
         window.loginWithPhone = async function() {
             const phone = document.getElementById('loginPhoneInput').value.trim();
+            const password = document.getElementById('loginPasswordInput').value.trim();
             
             if (!isValidPhone(phone)) {
                 showNotification('সঠিক 11 ডিজিটের নাম্বার দিন', 'error');
+                return;
+            }
+
+            if(!password) {
+                showNotification('পাসওয়ার্ড দিন', 'error');
                 return;
             }
 
@@ -397,7 +440,14 @@
                 return;
             }
 
-            if (snapshot.val().blocked === true) {
+            const userData = snapshot.val();
+            
+            if(userData.password !== password) {
+                showNotification('পাসওয়ার্ড ভুল!', 'error');
+                return;
+            }
+
+            if (userData.blocked === true) {
                 document.body.innerHTML = `<div style="text-align:center; margin-top:100px; padding:20px;"><h1 style="color:#dc3545;"><i class="fas fa-ban"></i></h1><h2>Account Blocked</h2></div>`;
                 return;
             }
