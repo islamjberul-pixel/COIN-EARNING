@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad - Please Wait</title>
+<style>
+    body, html {
+        margin: 0; padding: 0; height: 100%;
+        background: #0f0c29; font-family: 'Segoe UI', sans-serif;
+        overflow: hidden;
+    }
+   .top-bar {
+        position: fixed; top: 0; left: 0; right: 0;
+        background: #16213e; color: #fff;
+        padding: 12px 15px; display: flex; justify-content: space-between;
+        align-items: center; z-index: 9999;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+   .timer {
+        font-size: 18px; font-weight: bold;
+        color: #ffc107;
+    }
+   .close-btn {
+        background: #dc3545; color: white;
+        border: none; padding: 8px 15px;
+        border-radius: 5px; font-weight: 600;
+        cursor: pointer; display: none;
+    }
+   .close-btn.show {
+        display: block;
+    }
+    iframe {
+        width: 100%; height: 100%;
+        border: none; margin-top: 50px;
+    }
+   .overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.8); color: white;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 24px; z-index: 9998;
+    }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div>অ্যাড দেখুন <span class="timer" id="timer">5</span> সেকেন্ড</div>
+    <button class="close-btn" id="closeBtn" onclick="closeAd()">Close Ad</button>
+</div>
+
+<div class="overlay" id="overlay">লোড হচ্ছে...</div>
+<iframe id="adFrame"></iframe>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const adLink = urlParams.get('link');
+
+    if (!adLink) {
+        alert('Invalid Ad Link');
+        window.close();
+    }
+
+    document.getElementById('adFrame').src = adLink;
+
+    let timeLeft = 5;
+    const timerEl = document.getElementById('timer');
+    const closeBtn = document.getElementById('closeBtn');
+    const overlay = document.getElementById('overlay');
+
+    document.getElementById('adFrame').onload = () => {
+        overlay.style.display = 'none';
+    }
+
+    const countdown = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            timerEl.textContent = '0';
+            closeBtn.classList.add('show');
+        }
+    }, 1000);
+
+    function closeAd() {
+        if (window.opener) {
+            window.opener.postMessage('adCompleted', '*');
+        }
+        window.close();
+    }
+
+    window.onbeforeunload = function() {
+        if (timeLeft > 0) {
+            return "অ্যাড শেষ না করে বের হলে COIN পাবে না";
+        }
+    }
+</script>
+
+</body>
+</html>
