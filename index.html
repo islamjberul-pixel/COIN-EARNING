@@ -328,8 +328,6 @@
         let userPhone = null;
         let isBlocked = false;
 
-        const DIRECT_LINK = "https://omg10.com/4/11026560";
-
         // Validate BD phone number
         function isValidPhone(phone) {
             return /^01[3-9]\d{8}$/.test(phone);
@@ -353,7 +351,6 @@
                 return;
             }
 
-            // Check if phone already exists
             const snapshot = await get(ref(db, 'users/' + phone));
             if (snapshot.exists()) {
                 showNotification('এই নাম্বার দিয়ে আগেই অ্যাকাউন্ট আছে। Login করুন', 'error');
@@ -376,7 +373,6 @@
 
             showNotification('রেজিস্ট্রেশন সফল!', 'success');
             
-            // Directly go to home page
             document.getElementById('authGate').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
             await initApp();
@@ -471,11 +467,6 @@
             document.getElementById('notification-text').textContent = message;
             notification.className = `notification ${type} show`;
             setTimeout(() => notification.classList.remove('show'), 3000);
-        }
-
-        window.openAdPage = function() {
-            if (isBlocked) return;
-            window.open('ad.html?link=' + encodeURIComponent(DIRECT_LINK), '_blank');
         }
 
         window.addEventListener('message', function(e) {
@@ -617,6 +608,30 @@
                 }
             });
         }
+
+        // ONCLICK AD FUNCTION - Changed from Direct Link
+        function openAdPage() {
+            if (isBlocked) return;
+            
+            // Trigger OnClick ad by simulating a click
+            var evt = new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            document.body.dispatchEvent(evt);
+            
+            // Open ad page after 2 seconds for timer
+            setTimeout(() => {
+                window.open('ad.html', '_blank');
+            }, 2000);
+            
+            showNotification('অ্যাড লোড হচ্ছে...', 'warning');
+        }
+
+        // Expose to global scope for onclick attribute
+        window.openAdPage = openAdPage;
+
     </script>
 </body>
 </html>
