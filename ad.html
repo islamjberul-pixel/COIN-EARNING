@@ -30,63 +30,60 @@
    .close-btn.show {
         display: block;
     }
-    iframe {
+   .content {
         width: 100%; height: 100%;
-        border: none; margin-top: 50px;
-    }
-   .overlay {
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.8); color: white;
         display: flex; align-items: center; justify-content: center;
-        font-size: 24px; z-index: 9998;
+        flex-direction: column; color: white;
+        padding-top: 50px;
+    }
+   .big-timer {
+        font-size: 72px; font-weight: bold;
+        color: #4a6bff; margin-bottom: 20px;
+    }
+   .msg {
+        font-size: 18px; color: #adb5bd;
+        text-align: center; padding: 0 20px;
     }
 </style>
 </head>
 <body>
 
 <div class="top-bar">
-    <div>অ্যাড দেখুন <span class="timer" id="timer">5</span> সেকেন্ড</div>
+    <div>অ্যাড দেখুন <span class="timer" id="timer">15</span> সেকেন্ড</div>
     <button class="close-btn" id="closeBtn" onclick="closeAd()">Close Ad</button>
 </div>
 
-<div class="overlay" id="overlay">লোড হচ্ছে...</div>
-<iframe id="adFrame"></iframe>
+<div class="content">
+    <div class="big-timer" id="bigTimer">15</div>
+    <div class="msg">অ্যাড দেখুন, টাইম শেষ হলে Close বাটন আসবে</div>
+    <div class="msg" style="font-size: 14px; margin-top: 10px;">এই ট্যাব বন্ধ করবেন না</div>
+</div>
 
 <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const adLink = urlParams.get('link');
-
-    if (!adLink) {
-        alert('Invalid Ad Link');
-        window.close();
-    }
-
-    document.getElementById('adFrame').src = adLink;
-
-    let timeLeft = 5;
+    let timeLeft = 15;
     const timerEl = document.getElementById('timer');
+    const bigTimerEl = document.getElementById('bigTimer');
     const closeBtn = document.getElementById('closeBtn');
-    const overlay = document.getElementById('overlay');
-
-    document.getElementById('adFrame').onload = () => {
-        overlay.style.display = 'none';
-    }
 
     const countdown = setInterval(() => {
         timeLeft--;
         timerEl.textContent = timeLeft;
+        bigTimerEl.textContent = timeLeft;
 
         if (timeLeft <= 0) {
             clearInterval(countdown);
             timerEl.textContent = '0';
+            bigTimerEl.textContent = '✓';
             closeBtn.classList.add('show');
+            
+            // মেইন পেজে মেসেজ পাঠাও COIN যোগ করার জন্য
+            if (window.opener) {
+                window.opener.postMessage('adCompleted', '*');
+            }
         }
     }, 1000);
 
     function closeAd() {
-        if (window.opener) {
-            window.opener.postMessage('adCompleted', '*');
-        }
         window.close();
     }
 
