@@ -92,11 +92,9 @@
        .notification.success { border-left: 4px solid var(--success-color); }
        .notification.error { border-left: 4px solid var(--danger-color); }
        .notification.warning { border-left: 4px solid var(--warning-color); }
-       .withdraw-history {
-            margin-top: 20px;
-        }
+       .withdraw-history { margin-top: 20px; }
        .withdraw-item {
-            background: rgba(0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 10px;
+            background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 10px;
             display: flex; justify-content: space-between; align-items: center;
         }
        .withdraw-status {
@@ -243,7 +241,7 @@
         <span id="notification-text"></span>
     </div>
 
-    <!-- Monetag Onclick Zone 1: 11026471 -->
+    <!-- Monetag OnClick Zone: 11026471 -->
     <script src='//libtl.com/sdk.js' data-zone='11026471' data-sdk='show_11026471'></script>
 
     <script type="module">
@@ -307,13 +305,11 @@
         function updateUI() {
             const totalCoins = earnedPoints + referralEarnings;
             const totalTaka = totalCoins / 1000;
-
             document.getElementById('watched-ads').textContent = watchedAdsCount;
             document.getElementById('earned-money').textContent = totalCoins.toFixed(2);
             document.getElementById('referral-count').textContent = referralCount;
             document.getElementById('referral-earnings').textContent = referralEarnings.toFixed(2);
             document.getElementById('total-earned-taka').textContent = totalTaka.toFixed(2);
-
             const progressPercent = (earnedPoints / settings.minWithdraw) * 100;
             document.getElementById('progress-fill').style.width = `${Math.min(progressPercent, 100)}%`;
             document.getElementById('ads-progress').textContent = `${earnedPoints.toFixed(0)}/${settings.minWithdraw} COIN`;
@@ -326,21 +322,18 @@
             setTimeout(() => notification.classList.remove('show'), 3000);
         }
 
-        // সব function window এ attach করছি যাতে onclick কাজ করে
+        // Global functions for buttons
         window.watchAd = async function() {
             if (isBlocked) return;
             if (isAdLoading) return;
-
-            if (typeof window.show_11026471!== 'function') {
+            if (typeof window['show_11026471']!== 'function') {
                 showNotification('অ্যাড লোড হচ্ছে, 3 সেকেন্ড অপেক্ষা করো', 'warning');
                 return;
             }
-
             isAdLoading = true;
             document.getElementById('watch-ad-btn').disabled = true;
-
             try {
-                await window.show_11026471().then(() => {
+                await window['show_11026471']().then(() => {
                     watchedAdsCount++;
                     earnedPoints += settings.perAdRate;
                     saveUserData();
@@ -351,9 +344,7 @@
                 });
             } catch (error) {
                 showNotification('অ্যাড লোড হয়নি', 'error');
-                console.log(error);
             }
-
             isAdLoading = false;
             document.getElementById('watch-ad-btn').disabled = false;
         }
@@ -363,7 +354,6 @@
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             element.classList.add('active');
-
             if (pageId === 'withdraw-page') {
                 document.getElementById('total-earned-withdraw').textContent = (earnedPoints + referralEarnings).toFixed(2);
                 document.getElementById('total-earned-taka').textContent = ((earnedPoints + referralEarnings) / 1000).toFixed(2);
@@ -376,12 +366,10 @@
 
         window.withdrawPoints = async function() {
             if (isBlocked) return;
-
             const amount = parseFloat(document.getElementById('withdraw-amount').value);
             const paymentMethod = document.getElementById('payment-method').value;
             const phoneNumber = document.getElementById('withdraw-phone').value;
             const total = earnedPoints + referralEarnings;
-
             if (!amount || amount < settings.minWithdraw) {
                 showNotification(`ন্যূনতম ${settings.minWithdraw} COIN লাগবে`, 'error');
                 return;
@@ -394,7 +382,6 @@
                 showNotification('সব তথ্য পূরণ করো', 'error');
                 return;
             }
-
             let remaining = amount;
             if (referralEarnings > 0) {
                 const deduct = Math.min(referralEarnings, remaining);
@@ -402,25 +389,15 @@
                 remaining -= deduct;
             }
             earnedPoints = Math.max(0, earnedPoints - remaining);
-
             await saveUserData();
-
-            const withdrawData = {
-                userId,
-                amount,
-                paymentMethod,
-                phoneNumber,
-                status: 'pending',
-                timestamp: Date.now()
-            };
-
-            await push(ref(db, 'withdraw_requests'), withdrawData);
+            await push(ref(db, 'withdraw_requests'), {
+                userId, amount, paymentMethod, phoneNumber,
+                status: 'pending', timestamp: Date.now()
+            });
             showNotification('Withdraw Request Sent! Pending Approval', 'warning');
-
             document.getElementById('withdraw-amount').value = '';
             document.getElementById('payment-method').value = '';
             document.getElementById('withdraw-phone').value = '';
-
             updateUI();
             loadWithdrawHistory();
         }
@@ -445,16 +422,9 @@
             const userSnap = await get(ref(db, 'users/' + userId));
             if (userSnap.exists() && userSnap.val().blocked === true) {
                 isBlocked = true;
-                document.body.innerHTML = `
-                    <div style="text-align:center; margin-top:100px; padding:20px;">
-                        <h1 style="color:#dc3545; margin-bottom:20px;"><i class="fas fa-ban"></i></h1>
-                        <h2>Account Blocked</h2>
-                        <p style="color:#adb5bd; margin-top:10px;">তোমার অ্যাকাউন্ট ব্লক করা হয়েছে</p>
-                    </div>
-                `;
+                document.body.innerHTML = `<div style="text-align:center; margin-top:100px; padding:20px;"><h1 style="color:#dc3545;"><i class="fas fa-ban"></i></h1><h2>Account Blocked</h2></div>`;
                 return;
             }
-
             checkReferral();
             document.getElementById('user-id').textContent = userId;
             document.getElementById('user-avatar').textContent = userId.charAt(0).toUpperCase();
@@ -478,13 +448,12 @@
         }
 
         function generateReferralLink() {
-            const referralLink = `${window.location.href.split('?')[0]}?ref=${userId}`;
-            document.getElementById('referral-link').value = referralLink;
+            document.getElementById('referral-link').value = `${window.location.href.split('?')[0]}?ref=${userId}`;
         }
 
         function checkAdReady() {
-            if (typeof window.show_11026471!== 'function') {
-                setTimeout(checkAdReady, 1000);
+            if (typeof window['show_11026471']!== 'function') {
+                setTimeout(checkAdReady, 1500);
             } else {
                 document.getElementById('ad-status').innerHTML = '<i class="fas fa-check-circle"></i> বিজ্ঞাপন প্রস্তুত';
             }
@@ -496,20 +465,9 @@
                 const data = snapshot.val();
                 const container = document.getElementById('withdraw-history-list');
                 container.innerHTML = '';
-
                 if (data) {
-                    const requests = Object.entries(data).sort((a, b) => b[1].timestamp - a[1].timestamp);
-                    requests.forEach(([key, req]) => {
-                        container.innerHTML += `
-                            <div class="withdraw-item">
-                                <div>
-                                    <strong>${req.amount} COIN</strong><br>
-                                    <small style="color:var(--text-muted);">${req.paymentMethod} - ${req.phoneNumber}</small><br>
-                                    <small style="color:var(--text-muted);">${new Date(req.timestamp).toLocaleString('bn-BD')}</small>
-                                </div>
-                                <div class="withdraw-status status-${req.status}">${req.status.toUpperCase()}</div>
-                            </div>
-                        `;
+                    Object.entries(data).sort((a, b) => b[1].timestamp - a[1].timestamp).forEach(([key, req]) => {
+                        container.innerHTML += `<div class="withdraw-item"><div><strong>${req.amount} COIN</strong><br><small style="color:var(--text-muted);">${req.paymentMethod} - ${req.phoneNumber}</small><br><small style="color:var(--text-muted);">${new Date(req.timestamp).toLocaleString('bn-BD')}</small></div><div class="withdraw-status status-${req.status}">${req.status.toUpperCase()}</div></div>`;
                     });
                 } else {
                     container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">No withdraw history</p>';
@@ -524,13 +482,7 @@
                 container.innerHTML = '';
                 if (data) {
                     Object.values(data).reverse().forEach(notice => {
-                        container.innerHTML += `
-                            <div class="stat-card">
-                                <h3>${notice.title}</h3>
-                                <p>${notice.message}</p>
-                                <small>${new Date(notice.timestamp).toLocaleString('bn-BD')}</small>
-                            </div>
-                        `;
+                        container.innerHTML += `<div class="stat-card"><h3>${notice.title}</h3><p>${notice.message}</p><small>${new Date(notice.timestamp).toLocaleString('bn-BD')}</small></div>`;
                     });
                 }
             });
@@ -544,14 +496,17 @@
         }
     </script>
 
-    <!-- Monetag In-Page Push Zone: 11026478 -->
+    <!-- Monetag Push Zone: 11026478 -->
     <script>
     (function(d, z, s) {
       s.src = 'https://5gvci.com/act/files/tag.min.js?z=' + z;
-      try {
-        (document.body || document.documentElement).appendChild(s)
-      } catch(e) {}
+      try { (document.body || document.documentElement).appendChild(s) } catch(e) {}
     })('libtl.com', 11026478, document.createElement('script'))
+    </script>
+
+    <!-- Monetag In-Page Push Zone: 11026483 -->
+    <script>
+    (function(s){s.dataset.zone='11026483',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
     </script>
 </body>
 </html>
