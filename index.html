@@ -15,6 +15,7 @@
             --card-bg: #16213e;
             --text-color: #e6e6e6;
             --text-muted: #adb5bd;
+            --dark-bg: #0f0c29;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -25,183 +26,277 @@
             padding: 15px;
             padding-bottom: 70px;
         }
-     .container { max-width: 500px; margin: 0 auto; background: rgba(22, 33, 62, 0.9); border-radius: 15px; padding-bottom: 20px; }
-     .header { background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); color: white; padding: 20px; text-align: center; }
-     .user-card,.stat-card,.progress-container,.referral-section,.rate-info,.withdraw-section,.ad-status { background-color: var(--card-bg); margin: 15px; padding: 15px; border-radius: 10px; }
-     .user-card { display: flex; align-items: center; }
-     .user-avatar { width: 50px; height: 50px; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; color: white; margin-right: 15px; }
-     .stats-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-     .stat-card { text-align: center; }
-     .stat-card h3 { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
-     .stat-card p { font-size: 24px; font-weight: 700; color: var(--primary-color); }
-     .progress-container { background: linear-gradient(to right, #0f0c29, #302b63); }
-     .progress-bar { height: 10px; background-color: rgba(255, 255, 255, 0.1); border-radius: 5px; overflow: hidden; margin-bottom: 10px; }
-     .progress-fill { height: 100%; background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); width: 0%; transition: width 0.5s ease; }
-     .action-buttons { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 15px; }
-     .btn { padding: 15px; border: none; border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-     .btn-primary { background: linear-gradient(to right, var(--primary-color), #6a11cb); color: white; }
-     .btn-secondary { background: linear-gradient(to right, #2c3e50, #4ca1af); color: var(--text-color); }
-     .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-     .form-group { margin-bottom: 15px; }
-     .form-group label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--text-muted); }
-     .form-group input,.form-group select { width: 100%; padding: 12px 15px; background-color: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: var(--text-color); font-size: 14px; outline: none; }
-     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 0; }
-     .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; font-size: 12px; padding: 5px 10px; border-radius: 10px; width: 33%; }
-     .nav-item.active { color: var(--primary-color); background: rgba(74, 107, 255, 0.2); }
-     .nav-item i { font-size: 20px; margin-bottom: 5px; }
-     .page-section { display: none; }
-     .page-section.active { display: block; }
-     .notification { position: fixed; top: 20px; right: 20px; padding: 15px; border-radius: 8px; background: var(--card-bg); transform: translateX(150%); transition: transform 0.5s ease; z-index: 1000; }
-     .notification.show { transform: translateX(0); }
-     .notification.success { border-left: 4px solid var(--success-color); }
-     .notification.error { border-left: 4px solid var(--danger-color); }
-     .notification.warning { border-left: 4px solid var(--warning-color); }
-     .withdraw-history { margin-top: 20px; }
-     .withdraw-item { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-     .withdraw-status { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-     .status-pending { background: var(--warning-color); color: #000; }
-     .status-approved { background: var(--success-color); color: white; }
-     .status-rejected { background: var(--danger-color); color: white; }
-     .conversion-note { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px; }
+
+        /* Auth Gate */
+        #authGate {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--dark-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+      .auth-box {
+            background: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: 15px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+      .auth-box h2 { color: white; margin-bottom: 10px; }
+      .auth-box p { color: var(--text-muted); margin-bottom: 30px; font-size: 14px; }
+      .auth-btn {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+      .btn-register {
+            background: linear-gradient(to right, var(--primary-color), #6a11cb);
+            color: white;
+        }
+      .btn-login {
+            background: transparent;
+            color: white;
+            border: 2px solid var(--primary-color);
+        }
+      .login-input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        #mainApp { display: none; }
+
+        /* Main App Styles */
+      .container { max-width: 500px; margin: 0 auto; background: rgba(22, 33, 62, 0.9); border-radius: 15px; padding-bottom: 20px; }
+      .header { background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); color: white; padding: 20px; text-align: center; }
+      .user-card,.stat-card,.progress-container,.referral-section,.rate-info,.withdraw-section,.ad-status { background-color: var(--card-bg); margin: 15px; padding: 15px; border-radius: 10px; }
+      .user-card { display: flex; align-items: center; }
+      .user-avatar { width: 50px; height: 50px; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; color: white; margin-right: 15px; }
+      .stats-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+      .stat-card { text-align: center; }
+      .stat-card h3 { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+      .stat-card p { font-size: 24px; font-weight: 700; color: var(--primary-color); }
+      .progress-container { background: linear-gradient(to right, #0f0c29, #302b63); }
+      .progress-bar { height: 10px; background-color: rgba(255, 255, 255, 0.1); border-radius: 5px; overflow: hidden; margin-bottom: 10px; }
+      .progress-fill { height: 100%; background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); width: 0%; transition: width 0.5s ease; }
+      .action-buttons { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 15px; }
+      .btn { padding: 15px; border: none; border-radius: 10px; font-weight: 600; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+      .btn-primary { background: linear-gradient(to right, var(--primary-color), #6a11cb); color: white; }
+      .btn-secondary { background: linear-gradient(to right, #2c3e50, #4ca1af); color: var(--text-color); }
+      .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+      .form-group { margin-bottom: 15px; }
+      .form-group label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--text-muted); }
+      .form-group input,.form-group select { width: 100%; padding: 12px 15px; background-color: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: var(--text-color); font-size: 14px; outline: none; }
+      .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 0; }
+      .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; font-size: 12px; padding: 5px 10px; border-radius: 10px; width: 33%; }
+      .nav-item.active { color: var(--primary-color); background: rgba(74, 107, 255, 0.2); }
+      .nav-item i { font-size: 20px; margin-bottom: 5px; }
+      .page-section { display: none; }
+      .page-section.active { display: block; }
+      .notification { position: fixed; top: 20px; right: 20px; padding: 15px; border-radius: 8px; background: var(--card-bg); transform: translateX(150%); transition: transform 0.5s ease; z-index: 1000; }
+      .notification.show { transform: translateX(0); }
+      .notification.success { border-left: 4px solid var(--success-color); }
+      .notification.error { border-left: 4px solid var(--danger-color); }
+      .notification.warning { border-left: 4px solid var(--warning-color); }
+      .withdraw-history { margin-top: 20px; }
+      .withdraw-item { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+      .withdraw-status { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+      .status-pending { background: var(--warning-color); color: #000; }
+      .status-approved { background: var(--success-color); color: white; }
+      .status-rejected { background: var(--danger-color); color: white; }
+      .conversion-note { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px; }
+      .logout-btn { background: var(--danger-color); border: none; padding: 8px 15px; border-radius: 8px; color: white; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>COIN আয় করুন</h1>
-            <p>বিজ্ঞাপন দেখে COIN আয় করুন</p>
-        </div>
 
-        <div class="page-section active" id="home-page">
-            <div class="user-card">
-                <div class="user-avatar" id="user-avatar">U</div>
-                <div class="user-info">
-                    <h3 id="user-name">ব্যবহারকারী</h3>
-                    <p>আইডি: <span id="user-id">12345</span></p>
+    <!-- Auth Gate -->
+    <div id="authGate">
+        <div class="auth-box">
+            <h2><i class="fas fa-coins"></i> COIN আয় করুন</h2>
+            <p>অ্যাড দেখে কয়েন আয় করতে শুরু করুন</p>
+
+            <button class="auth-btn btn-register" onclick="autoRegister()">
+                <i class="fas fa-user-plus"></i> Registration
+            </button>
+
+            <button class="auth-btn btn-login" onclick="showLoginInput()">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+
+            <div id="loginInputBox" style="display:none; margin-top:15px;">
+                <input type="text" id="loginIdInput" class="login-input" placeholder="আপনার ID বসান" maxlength="6">
+                <button class="auth-btn btn-login" onclick="loginWithId()">Login করুন</button>
+                <button class="auth-btn btn-login" style="background:transparent; border:none; color:var(--text-muted);" onclick="hideLoginInput()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp">
+        <div class="container">
+            <div class="header">
+                <h1>COIN আয় করুন</h1>
+                <p>বিজ্ঞাপন দেখে COIN আয় করুন</p>
+            </div>
+
+            <div class="page-section active" id="home-page">
+                <div class="user-card">
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <div class="user-info">
+                        <h3 id="user-name">ব্যবহারকারী</h3>
+                        <p>আইডি: <span id="user-id">12345</span></p>
+                        <button class="logout-btn" onclick="logout()">লগআউট</button>
+                    </div>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <h3>দেখা বিজ্ঞাপন</h3>
+                        <p id="watched-ads">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>আয়কৃত COIN</h3>
+                        <p id="earned-money">0.00 <small>COIN</small></p>
+                    </div>
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-header" style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                        <h3>অগ্রগতি</h3>
+                        <span id="ads-progress">0/20</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="ad-status" id="ad-status">
+                    <i class="fas fa-check-circle"></i> প্রস্তুত
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="watch-ad-btn" onclick="openAdPage()">
+                        <i class="fas fa-play"></i> বিজ্ঞাপন দেখুন (<span id="rate-per-ad">0.01</span> COIN)
+                    </button>
+                    <button class="btn btn-secondary" onclick="showWithdrawForm()">
+                        <i class="fas fa-wallet"></i> COIN উত্তোলন
+                    </button>
+                </div>
+
+                <div class="referral-section">
+                    <h3 style="margin-bottom:15px;"><i class="fas fa-users"></i> বন্ধুকে আমন্ত্রণ করুন</h3>
+                    <div style="display:flex; justify-content:space-between; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">
+                        <div>আমন্ত্রিত: <strong id="referral-count">0</strong></div>
+                        <div>আয়: <strong id="referral-earnings">0.00</strong> COIN</div>
+                    </div>
+                    <div style="display:flex; margin-top:15px;">
+                        <input type="text" id="referral-link" readonly class="form-control" style="border-radius:8px 0 0 8px;">
+                        <button onclick="copyReferralLink()" class="btn btn-primary" style="border-radius:0 8px 8px 0;">কপি</button>
+                    </div>
+                </div>
+
+                <div class="rate-info">
+                    <p>প্রতি বিজ্ঞাপন = <span id="rate-per-ad2">0.01</span> COIN</p>
+                    <p>ন্যূনতম উত্তোলন: <span id="min-withdraw">20</span> COIN</p>
+                    <p>রেফারেল বোনাস: <span id="referral-bonus">5</span> COIN</p>
+                    <p class="conversion-note">1000 COIN = 1 টাকা</p>
                 </div>
             </div>
 
-            <div class="stats-container">
+            <div class="page-section" id="withdraw-page">
+                <h3 style="padding:15px;"><i class="fas fa-wallet"></i> COIN উত্তোলন</h3>
                 <div class="stat-card">
-                    <h3>দেখা বিজ্ঞাপন</h3>
-                    <p id="watched-ads">0</p>
+                    <h3>মোট আয়</h3>
+                    <p id="total-earned-withdraw">0.00 <small>COIN</small></p>
+                    <p class="conversion-note">≈ <span id="total-earned-taka">0.00</span> টাকা</p>
                 </div>
-                <div class="stat-card">
-                    <h3>আয়কৃত COIN</h3>
-                    <p id="earned-money">0.00 <small>COIN</small></p>
+
+                <div class="withdraw-section" id="withdraw-section">
+                    <div class="form-group">
+                        <label>পরিমাণ (COIN)</label>
+                        <input type="number" id="withdraw-amount" class="form-control" min="20000">
+                        <small style="color:var(--text-muted);">ন্যূনতম 20000 COIN = 20 টাকা</small>
+                    </div>
+                    <div class="form-group">
+                        <label>পেমেন্ট মাধ্যম</label>
+                        <select id="payment-method" class="form-control">
+                            <option value="" disabled selected>নির্বাচন করুন</option>
+                            <option value="bkash">bKash</option>
+                            <option value="nagad">Nagad</option>
+                            <option value="rocket">Rocket</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>মোবাইল নম্বর</label>
+                        <input type="text" id="withdraw-phone" class="form-control" placeholder="01XXXXXXXXX">
+                    </div>
+                    <button class="btn btn-primary" onclick="withdrawPoints()">
+                        <i class="fas fa-paper-plane"></i> অনুরোধ পাঠান
+                    </button>
+                </div>
+
+                <div class="withdraw-history">
+                    <h4 style="margin-bottom:10px;">Withdraw History</h4>
+                    <div id="withdraw-history-list"></div>
                 </div>
             </div>
 
-            <div class="progress-container">
-                <div class="progress-header" style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                    <h3>অগ্রগতি</h3>
-                    <span id="ads-progress">0/20</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress-fill"></div>
-                </div>
-            </div>
-
-            <div class="ad-status" id="ad-status">
-                <i class="fas fa-check-circle"></i> প্রস্তুত
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn btn-primary" id="watch-ad-btn" onclick="openAdPage()">
-                    <i class="fas fa-play"></i> বিজ্ঞাপন দেখুন (<span id="rate-per-ad">0.01</span> COIN)
-                </button>
-                <button class="btn btn-secondary" onclick="showWithdrawForm()">
-                    <i class="fas fa-wallet"></i> COIN উত্তোলন
-                </button>
-            </div>
-
-            <div class="referral-section">
-                <h3 style="margin-bottom:15px;"><i class="fas fa-users"></i> বন্ধুকে আমন্ত্রণ করুন</h3>
-                <div style="display:flex; justify-content:space-between; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">
-                    <div>আমন্ত্রিত: <strong id="referral-count">0</strong></div>
-                    <div>আয়: <strong id="referral-earnings">0.00</strong> COIN</div>
-                </div>
-                <div style="display:flex; margin-top:15px;">
-                    <input type="text" id="referral-link" readonly class="form-control" style="border-radius:8px 0 0 8px;">
-                    <button onclick="copyReferralLink()" class="btn btn-primary" style="border-radius:0 8px 8px 0;">কপি</button>
-                </div>
-            </div>
-
-            <div class="rate-info">
-                <p>প্রতি বিজ্ঞাপন = <span id="rate-per-ad2">0.01</span> COIN</p>
-                <p>ন্যূনতম উত্তোলন: <span id="min-withdraw">20</span> COIN</p>
-                <p>রেফারেল বোনাস: <span id="referral-bonus">5</span> COIN</p>
-                <p class="conversion-note">1000 COIN = 1 টাকা</p>
+            <div class="page-section" id="notice-page">
+                <h3 style="padding:15px;"><i class="fas fa-bell"></i> নোটিশ</h3>
+                <div id="notice-list"></div>
             </div>
         </div>
 
-        <div class="page-section" id="withdraw-page">
-            <h3 style="padding:15px;"><i class="fas fa-wallet"></i> COIN উত্তোলন</h3>
-            <div class="stat-card">
-                <h3>মোট আয়</h3>
-                <p id="total-earned-withdraw">0.00 <small>COIN</small></p>
-                <p class="conversion-note">≈ <span id="total-earned-taka">0.00</span> টাকা</p>
-            </div>
-
-            <div class="withdraw-section" id="withdraw-section">
-                <div class="form-group">
-                    <label>পরিমাণ (COIN)</label>
-                    <input type="number" id="withdraw-amount" class="form-control" min="20000">
-                    <small style="color:var(--text-muted);">ন্যূনতম 20000 COIN = 20 টাকা</small>
-                </div>
-                <div class="form-group">
-                    <label>পেমেন্ট মাধ্যম</label>
-                    <select id="payment-method" class="form-control">
-                        <option value="" disabled selected>নির্বাচন করুন</option>
-                        <option value="bkash">bKash</option>
-                        <option value="nagad">Nagad</option>
-                        <option value="rocket">Rocket</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>মোবাইল নম্বর</label>
-                    <input type="text" id="withdraw-phone" class="form-control" placeholder="01XXXXXXXXX">
-                </div>
-                <button class="btn btn-primary" onclick="withdrawPoints()">
-                    <i class="fas fa-paper-plane"></i> অনুরোধ পাঠান
-                </button>
-            </div>
-
-            <div class="withdraw-history">
-                <h4 style="margin-bottom:10px;">Withdraw History</h4>
-                <div id="withdraw-history-list"></div>
-            </div>
+        <div class="bottom-nav">
+            <a href="#" class="nav-item active" onclick="showPage('home-page', this)">
+                <i class="fas fa-home"></i>
+                <span>হোম</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('withdraw-page', this)">
+                <i class="fas fa-wallet"></i>
+                <span>উত্তোলন</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('notice-page', this)">
+                <i class="fas fa-bell"></i>
+                <span>নোটিশ</span>
+            </a>
         </div>
 
-        <div class="page-section" id="notice-page">
-            <h3 style="padding:15px;"><i class="fas fa-bell"></i> নোটিশ</h3>
-            <div id="notice-list"></div>
+        <div id="notification" class="notification">
+            <span id="notification-text"></span>
         </div>
-    </div>
 
-    <div class="bottom-nav">
-        <a href="#" class="nav-item active" onclick="showPage('home-page', this)">
-            <i class="fas fa-home"></i>
-            <span>হোম</span>
-        </a>
-        <a href="#" class="nav-item" onclick="showPage('withdraw-page', this)">
-            <i class="fas fa-wallet"></i>
-            <span>উত্তোলন</span>
-        </a>
-        <a href="#" class="nav-item" onclick="showPage('notice-page', this)">
-            <i class="fas fa-bell"></i>
-            <span>নোটিশ</span>
-        </a>
-    </div>
+        <!-- Site-wide OnClick Zone: 11026483 -->
+        <script>
+        (function(s){s.dataset.zone='11026483',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
+        </script>
 
-    <div id="notification" class="notification">
-        <span id="notification-text"></span>
+        <!-- Push Zone: 11026478 -->
+        <script>
+        (function(d, z, s) {
+          s.src = 'https://5gvci.com/act/files/tag.min.js?z=' + z;
+          try { (document.body || document.documentElement).appendChild(s) } catch(e) {}
+        })('libtl.com', 11026478, document.createElement('script'))
+        </script>
     </div>
-
-    <!-- Site-wide OnClick Zone: 11026483 -->
-    <script>
-    (function(s){s.dataset.zone='11026483',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
-    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
@@ -226,18 +321,91 @@
         let earnedPoints = 0.00;
         let referralCount = 0;
         let referralEarnings = 0.00;
-        let userId = generateUserId();
+        let userId = null;
         let isBlocked = false;
 
         const DIRECT_LINK = "https://omg10.com/4/11026560";
 
-        function generateUserId() {
-            let id = localStorage.getItem('userId');
-            if (!id) {
-                id = Math.floor(100000 + Math.random() * 900000).toString();
-                localStorage.setItem('userId', id);
+        // Show login input field
+        window.showLoginInput = function() {
+            document.getElementById('loginInputBox').style.display = 'block';
+        }
+
+        window.hideLoginInput = function() {
+            document.getElementById('loginInputBox').style.display = 'none';
+        }
+
+        // Auto Registration - এক ক্লিকে হোমপেজে চলে যাবে
+        window.autoRegister = async function() {
+            userId = Math.floor(100000 + Math.random() * 900000).toString();
+            localStorage.setItem('userId', userId);
+
+            const userData = {
+                watchedAdsCount: 0,
+                earnedPoints: 0,
+                referralCount: 0,
+                referralEarnings: 0,
+                blocked: false,
+                createdAt: Date.now()
+            };
+            await set(ref(db, 'users/' + userId), userData);
+
+            // Directly go to home page
+            document.getElementById('authGate').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            await initApp();
+        }
+
+        // Login with ID
+        window.loginWithId = async function() {
+            const inputId = document.getElementById('loginIdInput').value.trim();
+            if (!inputId || inputId.length!== 6) {
+                showNotification('6 ডিজিটের সঠিক আইডি বসান', 'error');
+                return;
             }
-            return id;
+
+            const snapshot = await get(ref(db, 'users/' + inputId));
+            if (!snapshot.exists()) {
+                showNotification('এই আইডির কোনো অ্যাকাউন্ট নেই', 'error');
+                return;
+            }
+
+            if (snapshot.val().blocked === true) {
+                document.body.innerHTML = `<div style="text-align:center; margin-top:100px; padding:20px;"><h1 style="color:#dc3545;"><i class="fas fa-ban"></i></h1><h2>Account Blocked</h2></div>`;
+                return;
+            }
+
+            userId = inputId;
+            localStorage.setItem('userId', userId);
+
+            document.getElementById('authGate').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            await initApp();
+        }
+
+        // Auto login if ID exists in localStorage
+        window.onload = async function() {
+            await loadSettings();
+            const storedId = localStorage.getItem('userId');
+
+            if (storedId) {
+                // Auto login without showing gate
+                const snapshot = await get(ref(db, 'users/' + storedId));
+                if (snapshot.exists() && snapshot.val().blocked!== true) {
+                    userId = storedId;
+                    document.getElementById('authGate').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'block';
+                    await initApp();
+                }
+            }
+        }
+
+        // Logout
+        window.logout = function() {
+            if(confirm('লগআউট করবেন?')) {
+                localStorage.removeItem('userId');
+                location.reload();
+            }
         }
 
         async function loadUserData() {
@@ -252,7 +420,7 @@
         }
 
         async function saveUserData() {
-            await set(ref(db, 'users/' + userId), {
+            await update(ref(db, 'users/' + userId), {
                 watchedAdsCount, earnedPoints, referralCount, referralEarnings, blocked: isBlocked, lastUpdate: Date.now()
             });
         }
@@ -260,6 +428,8 @@
         function updateUI() {
             const totalCoins = earnedPoints + referralEarnings;
             const totalTaka = totalCoins / 1000;
+            document.getElementById('user-id').textContent = userId;
+            document.getElementById('user-avatar').textContent = userId.charAt(0).toUpperCase();
             document.getElementById('watched-ads').textContent = watchedAdsCount;
             document.getElementById('earned-money').textContent = totalCoins.toFixed(2);
             document.getElementById('referral-count').textContent = referralCount;
@@ -277,13 +447,11 @@
             setTimeout(() => notification.classList.remove('show'), 3000);
         }
 
-        // Ad page খুলবে, COIN এখানে যোগ হবে না
         window.openAdPage = function() {
             if (isBlocked) return;
             window.open('ad.html?link=' + encodeURIComponent(DIRECT_LINK), '_blank');
         }
 
-        // Ad page থেকে মেসেজ আসলে COIN যোগ হবে
         window.addEventListener('message', function(e) {
             if (e.data === 'adCompleted') {
                 watchedAdsCount++;
@@ -364,18 +532,12 @@
         }
 
         async function initApp() {
-            const userSnap = await get(ref(db, 'users/' + userId));
-            if (userSnap.exists() && userSnap.val().blocked === true) {
-                isBlocked = true;
-                document.body.innerHTML = `<div style="text-align:center; margin-top:100px; padding:20px;"><h1 style="color:#dc3545;"><i class="fas fa-ban"></i></h1><h2>Account Blocked</h2></div>`;
-                return;
-            }
             checkReferral();
-            document.getElementById('user-id').textContent = userId;
-            document.getElementById('user-avatar').textContent = userId.charAt(0).toUpperCase();
             await loadUserData();
             updateUI();
             generateReferralLink();
+            loadNotices();
+            loadWithdrawHistory();
         }
 
         function checkReferral() {
@@ -384,9 +546,15 @@
             if (referrerId && referrerId!== userId &&!localStorage.getItem('referredBy')) {
                 localStorage.setItem('referredBy', referrerId);
                 showNotification('রেফারেল লিঙ্ক ব্যবহার করেছেন!', 'success');
-                update(ref(db, 'users/' + referrerId), {
-                    referralCount: (referralCount || 0) + 1,
-                    referralEarnings: (referralEarnings || 0) + settings.referralBonus
+                const refRef = ref(db, 'users/' + referrerId);
+                get(refRef).then(snap => {
+                    if (snap.exists()) {
+                        const data = snap.val();
+                        update(refRef, {
+                            referralCount: (data.referralCount || 0) + 1,
+                            referralEarnings: (data.referralEarnings || 0) + settings.referralBonus
+                        });
+                    }
                 });
             }
         }
@@ -423,21 +591,6 @@
                 }
             });
         }
-
-        window.onload = async function() {
-            await loadSettings();
-            await initApp();
-            loadNotices();
-            loadWithdrawHistory();
-        }
-    </script>
-
-    <!-- Push Zone: 11026478 -->
-    <script>
-    (function(d, z, s) {
-      s.src = 'https://5gvci.com/act/files/tag.min.js?z=' + z;
-      try { (document.body || document.documentElement).appendChild(s) } catch(e) {}
-    })('libtl.com', 11026478, document.createElement('script'))
     </script>
 </body>
 </html>
