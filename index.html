@@ -79,7 +79,7 @@
             color: white;
             font-size: 16px;
             text-align: center;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
         #mainApp { display: none; }
 
@@ -133,17 +133,20 @@
             <h2><i class="fas fa-coins"></i> COIN আয় করুন</h2>
             <p>অ্যাড দেখে কয়েন আয় করতে শুরু করুন</p>
 
-            <button class="auth-btn btn-register" onclick="autoRegister()">
-                <i class="fas fa-user-plus"></i> Registration
-            </button>
+            <div id="registerBox">
+                <input type="tel" id="registerPhone" class="login-input" placeholder="01XXXXXXXXX" maxlength="11">
+                <button class="auth-btn btn-register" onclick="registerWithPhone()">
+                    <i class="fas fa-user-plus"></i> Registration
+                </button>
+            </div>
 
             <button class="auth-btn btn-login" onclick="showLoginInput()">
                 <i class="fas fa-sign-in-alt"></i> Login
             </button>
 
             <div id="loginInputBox" style="display:none; margin-top:15px;">
-                <input type="text" id="loginIdInput" class="login-input" placeholder="আপনার ID বসান" maxlength="6">
-                <button class="auth-btn btn-login" onclick="loginWithId()">Login করুন</button>
+                <input type="tel" id="loginPhoneInput" class="login-input" placeholder="01XXXXXXXXX" maxlength="11">
+                <button class="auth-btn btn-login" onclick="loginWithPhone()">Login করুন</button>
                 <button class="auth-btn btn-login" style="background:transparent; border:none; color:var(--text-muted);" onclick="hideLoginInput()">Cancel</button>
             </div>
         </div>
@@ -162,7 +165,7 @@
                     <div class="user-avatar" id="user-avatar">U</div>
                     <div class="user-info">
                         <h3 id="user-name">ব্যবহারকারী</h3>
-                        <p>আইডি: <span id="user-id">12345</span></p>
+                        <p>নাম্বার: <span id="user-phone">01XXXXXXXXX</span></p>
                         <button class="logout-btn" onclick="logout()">লগআউট</button>
                     </div>
                 </div>
@@ -232,8 +235,8 @@
                 <div class="withdraw-section" id="withdraw-section">
                     <div class="form-group">
                         <label>পরিমাণ (COIN)</label>
-                        <input type="number" id="withdraw-amount" class="form-control" min="20000">
-                        <small style="color:var(--text-muted);">ন্যূনতম 20000 COIN = 20 টাকা</small>
+                        <input type="number" id="withdraw-amount" class="form-control" min="5000">
+                        <small style="color:var(--text-muted);">ন্যূনতম 5000 COIN = 5 টাকা</small>
                     </div>
                     <div class="form-group">
                         <label>পেমেন্ট মাধ্যম</label>
@@ -316,15 +319,20 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let settings = { perAdRate: 0.01, minWithdraw: 20000, referralBonus: 5.00 };
+        let settings = { perAdRate: 0.01, minWithdraw: 5000, referralBonus: 5.00 };
         let watchedAdsCount = 0;
         let earnedPoints = 0.00;
         let referralCount = 0;
         let referralEarnings = 0.00;
-        let userId = null;
+        let userPhone = null;
         let isBlocked = false;
 
         const DIRECT_LINK = "https://omg10.com/4/11026560";
+
+        // Validate BD phone number
+        function isValidPhone(phone) {
+            return /^01[3-9]\d{8}$/.test(phone);
+        }
 
         // Show login input field
         window.showLoginInput = function() {
@@ -335,12 +343,24 @@
             document.getElementById('loginInputBox').style.display = 'none';
         }
 
-        // Auto Registration - এক ক্লিকে হোমপেজে চলে যাবে
-        window.autoRegister = async function() {
-            userId = Math.floor(100000 + Math.random() * 900000).toString();
-            localStorage.setItem('userId', userId);
+        // Registration with Phone Number
+        window.registerWithPhone = async function() {
+            const phone = document.getElementById('registerPhone').value.trim();
+            
+            if (!isValidPhone(phone)) {
+                showNotification('সঠিক 11 ডিজিটের নাম্বার দিন। যেমন: 01712345678', 'error');
+                return;
+            }
+
+            // Check if phone already exists
+            const snapshot = await get(ref(db, 'users/' + phone));
+            if (snapshot.exists()) {
+                showNotification('এই নাম্বার দিয়ে আগেই অ্যাকাউন্ট আছে। Login করুন', 'error');
+                return;
+            }
 
             const userData = {
+                phone: phone,
                 watchedAdsCount: 0,
                 earnedPoints: 0,
                 referralCount: 0,
@@ -348,25 +368,31 @@
                 blocked: false,
                 createdAt: Date.now()
             };
-            await set(ref(db, 'users/' + userId), userData);
+            
+            await set(ref(db, 'users/' + phone), userData);
+            localStorage.setItem('userPhone', phone);
+            userPhone = phone;
 
+            showNotification('রেজিস্ট্রেশন সফল!', 'success');
+            
             // Directly go to home page
             document.getElementById('authGate').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
             await initApp();
         }
 
-        // Login with ID
-        window.loginWithId = async function() {
-            const inputId = document.getElementById('loginIdInput').value.trim();
-            if (!inputId || inputId.length!== 6) {
-                showNotification('6 ডিজিটের সঠিক আইডি বসান', 'error');
+        // Login with Phone Number
+        window.loginWithPhone = async function() {
+            const phone = document.getElementById('loginPhoneInput').value.trim();
+            
+            if (!isValidPhone(phone)) {
+                showNotification('সঠিক 11 ডিজিটের নাম্বার দিন', 'error');
                 return;
             }
 
-            const snapshot = await get(ref(db, 'users/' + inputId));
+            const snapshot = await get(ref(db, 'users/' + phone));
             if (!snapshot.exists()) {
-                showNotification('এই আইডির কোনো অ্যাকাউন্ট নেই', 'error');
+                showNotification('এই নাম্বারে কোনো অ্যাকাউন্ট নেই। Registration করুন', 'error');
                 return;
             }
 
@@ -375,24 +401,23 @@
                 return;
             }
 
-            userId = inputId;
-            localStorage.setItem('userId', userId);
+            userPhone = phone;
+            localStorage.setItem('userPhone', phone);
 
             document.getElementById('authGate').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
             await initApp();
         }
 
-        // Auto login if ID exists in localStorage
+        // Auto login if phone exists in localStorage
         window.onload = async function() {
             await loadSettings();
-            const storedId = localStorage.getItem('userId');
+            const storedPhone = localStorage.getItem('userPhone');
 
-            if (storedId) {
-                // Auto login without showing gate
-                const snapshot = await get(ref(db, 'users/' + storedId));
+            if (storedPhone) {
+                const snapshot = await get(ref(db, 'users/' + storedPhone));
                 if (snapshot.exists() && snapshot.val().blocked!== true) {
-                    userId = storedId;
+                    userPhone = storedPhone;
                     document.getElementById('authGate').style.display = 'none';
                     document.getElementById('mainApp').style.display = 'block';
                     await initApp();
@@ -403,13 +428,13 @@
         // Logout
         window.logout = function() {
             if(confirm('লগআউট করবেন?')) {
-                localStorage.removeItem('userId');
+                localStorage.removeItem('userPhone');
                 location.reload();
             }
         }
 
         async function loadUserData() {
-            const snapshot = await get(ref(db, 'users/' + userId));
+            const snapshot = await get(ref(db, 'users/' + userPhone));
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 watchedAdsCount = data.watchedAdsCount || 0;
@@ -420,7 +445,7 @@
         }
 
         async function saveUserData() {
-            await update(ref(db, 'users/' + userId), {
+            await update(ref(db, 'users/' + userPhone), {
                 watchedAdsCount, earnedPoints, referralCount, referralEarnings, blocked: isBlocked, lastUpdate: Date.now()
             });
         }
@@ -428,8 +453,8 @@
         function updateUI() {
             const totalCoins = earnedPoints + referralEarnings;
             const totalTaka = totalCoins / 1000;
-            document.getElementById('user-id').textContent = userId;
-            document.getElementById('user-avatar').textContent = userId.charAt(0).toUpperCase();
+            document.getElementById('user-phone').textContent = userPhone;
+            document.getElementById('user-avatar').textContent = userPhone.slice(-2);
             document.getElementById('watched-ads').textContent = watchedAdsCount;
             document.getElementById('earned-money').textContent = totalCoins.toFixed(2);
             document.getElementById('referral-count').textContent = referralCount;
@@ -504,7 +529,7 @@
             earnedPoints = Math.max(0, earnedPoints - remaining);
             await saveUserData();
             await push(ref(db, 'withdraw_requests'), {
-                userId, amount, paymentMethod, phoneNumber,
+                userPhone, amount, paymentMethod, phoneNumber,
                 status: 'pending', timestamp: Date.now()
             });
             showNotification('Withdraw Request Sent! Pending Approval', 'warning');
@@ -542,11 +567,11 @@
 
         function checkReferral() {
             const urlParams = new URLSearchParams(window.location.search);
-            const referrerId = urlParams.get('ref');
-            if (referrerId && referrerId!== userId &&!localStorage.getItem('referredBy')) {
-                localStorage.setItem('referredBy', referrerId);
+            const referrerPhone = urlParams.get('ref');
+            if (referrerPhone && referrerPhone!== userPhone &&!localStorage.getItem('referredBy')) {
+                localStorage.setItem('referredBy', referrerPhone);
                 showNotification('রেফারেল লিঙ্ক ব্যবহার করেছেন!', 'success');
-                const refRef = ref(db, 'users/' + referrerId);
+                const refRef = ref(db, 'users/' + referrerPhone);
                 get(refRef).then(snap => {
                     if (snap.exists()) {
                         const data = snap.val();
@@ -560,11 +585,11 @@
         }
 
         function generateReferralLink() {
-            document.getElementById('referral-link').value = `${window.location.href.split('?')[0]}?ref=${userId}`;
+            document.getElementById('referral-link').value = `${window.location.href.split('?')[0]}?ref=${userPhone}`;
         }
 
         function loadWithdrawHistory() {
-            const q = query(ref(db, 'withdraw_requests'), orderByChild('userId'), equalTo(userId));
+            const q = query(ref(db, 'withdraw_requests'), orderByChild('userPhone'), equalTo(userPhone));
             onValue(q, (snapshot) => {
                 const data = snapshot.val();
                 const container = document.getElementById('withdraw-history-list');
